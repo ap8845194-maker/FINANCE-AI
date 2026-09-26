@@ -1,0 +1,16 @@
+{
+  "name": "finai-student-finance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Student Finance AI with Firebase and secure Groq backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.4.0"
+  }
+}

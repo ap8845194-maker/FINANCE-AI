@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Finance AI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="payment-styles.css?v=1">
+</head>
+
+<body>
+
+    <!-- =========================
+         LOGIN PAGE
+    ========================== -->
+
+    <div id="loginPage" class="login-page">
+
+        <!-- Background Effects -->
+        <div class="login-orb orb-1"></div>
+        <div class="login-orb orb-2"></div>
+        <div class="login-grid"></div>
+
+        <div class="login-card">
+
+            <!-- Brand -->
+            <div class="login-brand">
+
+                <div class="login-logo">
+                    ₹
+                </div>
+
+                <div>
+                    <h2>FinAI</h2>
+                    <span>Finance</span>
+                </div>
+
+            </div>
+
+
+            <!-- Heading -->
+            <div class="login-heading">
+
+                <span class="login-badge">
+                    🤖 AI FINANCE PLATFORM
+                </span>
+
+                <h1>
+                    Welcome back
+                    <span>👋</span>
+                </h1>
+
+                <p>
+                    Manage your money smarter with Finance AI.
+                </p>
+
+            </div>
+
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+
+                <!-- Email -->
+                <div class="login-field">
+
+                    <label for="loginEmail">
+                        Email Address
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ✉️
+                        </span>
+
+                        <input
+                            type="email"
+                            id="loginEmail"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="login-field">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            🔐
+                        </span>
+
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            placeholder="Enter your password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="password-toggle"
+                        >
+                            👁️
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Options -->
+                <div class="login-options">
+
+                    <label class="remember-option">
+
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                        >
+
+                        <span>
+                            Remember me
+                        </span>
+
+                    </label>
+
+                    <button
+                        type="button"
+                        id="forgotPassword"
+                        class="forgot-btn"
+                    >
+                        Forgot password?
+                    </button>
+
+                </div>
+
+
+                <!-- Login -->
+                <button
+                    type="submit"
+                    class="login-submit"
+                >
+                    <span>Login to FinAI</span>
+                    <span>→</span>
+                </button>
+
+            </form>
+
+
+            <!-- Divider -->
+            <div class="login-divider">
+                <span>OR</span>
+            </div>
+
+
+            <!-- Guest Login -->
+           <button type="button" id="googleLogin" class="google-btn">
+    <span class="google-icon">G</span>
+    Continue with Google
+</button>
+
+
+            <!-- Signup -->
+            <div class="login-footer">
+
+                <span>
+                    Don't have an account?
+                </span>
+
+                <button
+                    type="button"
+                    id="createAccount"
+                >
+                    Create Account
+                </button>
+
+            </div>
+
+
+            <!-- Security -->
+            <div class="login-security">
+
+                <span>🔒</span>
+
+                <span>
+                    Your financial data stays private
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- =========================
+     CREATE ACCOUNT MODAL
+========================= -->
+
+<div id="signupModal" class="auth-modal">
+
+    <div class="auth-modal-box">
+
+        <button
+            type="button"
+            class="auth-close"
+            id="closeSignup"
+        >
+            ×
+        </button>
+
+        <div class="auth-icon">
+            ✨
+        </div>
+
+        <h2>Create Account</h2>
+
+        <p>
+            Create your FinAI  account.
+        </p>
+
+        <form id="signupForm">
+
+            <label>
+                Full Name
+
+                <input
+                    type="text"
+                    id="signupName"
+                    placeholder="Enter your name"
+                    required
+                >
+            </label>
+
+            <label>
+                Email Address
+
+                <input
+                    type="email"
+                    id="signupEmail"
+                    placeholder="you@example.com"
+                    required
+                >
+            </label>
+
+            <label>
+                Password
+
+                <input
+                    type="password"
+                    id="signupPassword"
+                    placeholder="Create a password"
+                    minlength="6"
+                    required
+                >
+            </label>
+
+            <label>
+                Confirm Password
+
+                <input
+                    type="password"
+                    id="signupConfirmPassword"
+                    placeholder="Confirm password"
+                    minlength="6"
+                    required
+                >
+            </label>
+
+            <button
+                type="submit"
+                class="login-submit"
+            >
+                Create Account →
+            </button>
+
+        </form>
+
+        <button
+            type="button"
+            class="back-login"
+            id="backToLoginFromSignup"
+        >
+            ← Back to Login
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FORGOT PASSWORD MODAL
+========================= -->
+
+<div id="forgotModal" class="auth-modal">
+
+    <div class="auth-modal-box">
+
+        <button
+            type="button"
+            class="auth-close"
+            id="closeForgot"
+        >
+            ×
+        </button>
+
+        <div class="auth-icon">
+            🔐
+        </div>
+
+        <h2>Reset Password</h2>
+
+        <p>
+            Enter your email and we'll send you a password reset link.
+        </p>
+
+        <form id="forgotForm">
+
+            <label>
+                Email Address
+
+                <input
+                    type="email"
+                    id="forgotEmail"
+                    placeholder="you@example.com"
+                    required
+                >
+            </label>
+
+            <button
+                type="submit"
+                class="login-submit"
+            >
+                Send Reset Link →
+            </button>
+
+        </form>
+
+        <button
+            type="button"
+            class="back-login"
+            id="backToLoginFromForgot"
+        >
+            ← Back to Login
+        </button>
+
+    </div>
+
+</div>
+
+
+    <!-- =========================
+         DASHBOARD
+    ========================== -->
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ₹
+            </div>
+
+            <div>
+
+                <h2>
+                    FinAI
+                </h2>
+
+                <span>
+                    Finance AI
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <button
+                class="nav-item active"
+                data-section="dashboard"
+            >
+                <span>📊</span>
+                Dashboard
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-section="expenses"
+            >
+                <span>💸</span>
+                Expenses
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-section="budget"
+            >
+                <span>💰</span>
+                Budget
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-section="payments"
+            >
+                <span>💳</span>
+                UPI Payments
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-section="ai"
+            >
+                <span>🤖</span>
+                AI Advisor
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="tip-card">
+
+                <span>💡</span>
+
+                <strong>
+                    Finance Tip
+                </strong>
+
+                <p>
+                    Track every expense, even small ones.
+                </p>
+
+            </div>
+
+
+            <button
+                id="clearDataBtn"
+                class="clear-btn"
+            >
+                🗑️ Clear Data
+            </button>
+            <button id="logoutBtn" class="logout-btn">
+            🚪 Logout
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+
+                <p class="small-label">
+                    WELCOME BACK 👋
+                </p>
+
+                <h1>
+                    Finance AI
+                </h1>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <div
+                    class="date-box"
+                    id="currentDate"
+                ></div>
+
+
+                <button
+                    id="themeBtn"
+                    class="icon-btn"
+                    title="Toggle theme"
+                >
+                    🌙
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================
+             DASHBOARD SECTION
+        ========================== -->
+
+        <section
+            id="dashboard"
+            class="section active-section"
+        >
+
+            <!-- HERO -->
+
+            <div class="hero-card">
+
+                <div>
+
+                    <span class="badge">
+                        🤖 AI FINANCIAL ASSISTANT
+                    </span>
+
+
+                    <h2>
+
+                        Take control of your
+
+                        <span>
+                           finances AI.
+                        </span>
+
+                    </h2>
+
+
+                    <p>
+                        Track your spending, understand your habits
+                        and build better saving goals.
+                    </p>
+
+
+                    <button
+                        class="primary-btn"
+                        data-go="ai"
+                    >
+                        Ask Finance AI →
+                    </button>
+
+                </div>
+
+
+                <div class="hero-illustration">
+
+                    <div class="money-circle">
+                        ₹
+                    </div>
+
+
+                    <div class="floating-card card-one">
+                        💰 + Savings
+                    </div>
+
+
+                    <div class="floating-card card-two">
+                        📈 +12%
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STAT CARDS -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon income">
+                        💵
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Monthly Income
+                        </span>
+
+                        <h3 id="incomeStat">
+                            ₹0
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon expense">
+                        💸
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Expenses
+                        </span>
+
+                        <h3 id="expenseStat">
+                            ₹0
+                        </h3>
+                        <small id="expenseStatSub" style="font-size: 0.78rem; color: #94a3b8; display: block; margin-top: 2px;"></small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon savings">
+                        🏦
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Available Savings
+                        </span>
+
+                        <h3 id="savingsStat">
+                            ₹0
+                        </h3>
+                        <small id="savingsStatSub" style="font-size: 0.78rem; color: #10b981; display: block; margin-top: 2px;"></small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon score">
+                        ⭐
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Finance Score
+                        </span>
+
+                        <h3 id="scoreStat">
+                            0/100
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DASHBOARD GRID -->
+
+            <div class="dashboard-grid">
+
+                <!-- EXPENSE BREAKDOWN -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h3>
+                                Expense Breakdown
+                            </h3>
+
+                            <p>
+                                Your spending categories
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="expenseBreakdown"
+                        class="breakdown-list"
+                    >
+
+                        <div class="empty-state">
+                            No expenses added yet.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SAVINGS GOAL -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h3>
+                                Savings Goal
+                            </h3>
+
+                            <p>
+                                Track your target
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="goal-box">
+
+                        <div class="goal-top">
+
+                            <div>
+
+                                <span>
+                                    Target
+                                </span>
+
+                                <strong id="goalTarget">
+                                    ₹0
+                                </strong>
+
+                            </div>
+
+
+                            <div
+                                class="goal-percent"
+                                id="goalPercent"
+                            >
+                                0%
+                            </div>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div
+                                id="goalProgress"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="goal-bottom">
+
+                            <span>
+                                Saved:
+                                <strong id="goalSaved">
+                                    ₹0
+                                </strong>
+                            </span>
+
+                            <span id="goalRemaining">
+                                ₹0 remaining
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="secondary-btn"
+                        id="setGoalBtn"
+                    >
+                        🎯 Set Savings Goal
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT EXPENSES -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            Recent Expenses
+                        </h3>
+
+                        <p>
+                            Your latest transactions
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="text-btn"
+                        data-go="expenses"
+                    >
+                        View All →
+                    </button>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Expense
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="recentExpenses">
+
+                            <tr>
+
+                                <td
+                                    colspan="4"
+                                    class="empty-table"
+                                >
+                                    No expenses yet.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             EXPENSES
+        ========================== -->
+
+        <section
+            id="expenses"
+            class="section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="small-label">
+                        MONEY TRACKER
+                    </p>
+
+                    <h2>
+                        Manage Expenses
+                    </h2>
+
+                    <p>
+                        Add and track your daily spending.
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="primary-btn"
+                    id="openExpenseModal"
+                >
+                    + Add Expense
+                </button>
+
+            </div>
+
+
+            <div class="expense-summary">
+
+                <div>
+
+                    <span>
+                        Total Expenses
+                    </span>
+
+                    <strong id="expensePageTotal">
+                        ₹0
+                    </strong>
+                    <small id="expensePageLimit" style="font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 3px;"></small>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Transactions
+                    </span>
+
+                    <strong id="transactionCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Average Expense
+                    </span>
+
+                    <strong id="averageExpense">
+                        ₹0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Expense
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="expenseTable">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             BUDGET
+        ========================== -->
+
+        <section
+            id="budget"
+            class="section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="small-label">
+                        FINANCIAL PLANNING
+                    </p>
+
+                    <h2>
+                        Monthly Budget
+                    </h2>
+
+                    <p>
+                        Set your income and spending limits.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="budget-layout">
+
+                <div class="panel budget-form">
+
+                    <h3>
+                        Budget Settings
+                    </h3>
+
+
+                    <label>
+
+                        Monthly Income
+
+                        <input
+                            type="number"
+                            id="incomeInput"
+                            placeholder="e.g. 15000"
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        Monthly Budget
+
+                        <input
+                            type="number"
+                            id="budgetInput"
+                            placeholder="e.g. 12000"
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        Savings Goal
+
+                        <input
+                            type="number"
+                            id="goalInput"
+                            placeholder="e.g. 50000"
+                        >
+
+                    </label>
+
+
+                    <button
+                        class="primary-btn"
+                        id="saveBudgetBtn"
+                    >
+                        Save Budget
+                    </button>
+
+                </div>
+
+
+                <div class="panel budget-overview">
+
+                    <h3>
+                        Budget Overview
+                    </h3>
+
+
+                    <div class="budget-number">
+
+                        <span>
+                            Budget Remaining
+                        </span>
+
+                        <strong id="budgetRemaining">
+                            ₹0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress large">
+
+                        <div
+                            id="budgetProgress"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="budget-details">
+
+                        <span>
+
+                            Spent
+
+                            <strong id="budgetSpent">
+                                ₹0
+                            </strong>
+
+                        </span>
+
+
+                        <span>
+
+                            Limit
+
+                            <strong id="budgetLimit">
+                                ₹0
+                            </strong>
+
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="budgetMessage"
+                        class="budget-message"
+                    >
+                        Set your budget to start tracking.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+
+        <!-- =========================
+             UPI PAYMENTS
+        ========================== -->
+
+        <section
+            id="payments"
+            class="section"
+        >
+
+            <div class="section-heading">
+                <div>
+                    <p class="small-label">SMART PAYMENTS</p>
+                    <h2>UPI Payments & Tracker</h2>
+                    <p>Save your UPI ID, create a payment request, track transactions and upload payment proof.</p>
+                </div>
+                <span class="payment-heading-icon">💳</span>
+            </div>
+
+            <div class="payment-grid">
+
+                <div class="panel payment-card">
+                    <div class="payment-card-title">
+                        <div>
+                            <p class="small-label">YOUR UPI</p>
+                            <h3>Payment Setup</h3>
+                        </div>
+                        <span>🔐</span>
+                    </div>
+
+                    <label class="payment-label">
+                        Your UPI ID
+                        <input type="text" id="upiIdInput" placeholder="yourname@upi" autocomplete="off">
+                    </label>
+
+                    <label class="payment-label">
+                        Receiver / Purpose
+                        <input type="text" id="upiPayeeInput" placeholder="e.g. College Fee / Friend">
+                    </label>
+
+                    <button id="saveUpiBtn" class="primary-btn full-btn" type="button">
+                        Save UPI Details
+                    </button>
+
+                    <div class="upi-note">
+                        Your UPI ID is used to create a payment link/QR. Actual payment verification is not automatic unless a supported payment gateway is connected.
+                    </div>
+                </div>
+
+                <div class="panel payment-card">
+                    <div class="payment-card-title">
+                        <div>
+                            <p class="small-label">SEND PAYMENT</p>
+                            <h3>Create UPI Payment</h3>
+                        </div>
+                        <span>📲</span>
+                    </div>
+
+                    <label class="payment-label">
+                        Amount
+                        <input type="number" id="upiAmountInput" min="1" step="0.01" placeholder="₹ 500">
+                    </label>
+
+                    <label class="payment-label">
+                        Category
+                        <select id="upiCategoryInput">
+                            <option value="Food">🍔 Food</option>
+                            <option value="Education">📚 Education</option>
+                            <option value="Bills">💡 Bills</option>
+                            <option value="Travel">🚌 Travel</option>
+                            <option value="Shopping">🛍️ Shopping</option>
+                            <option value="Entertainment">🎮 Entertainment</option>
+                            <option value="Other" selected>📦 Other</option>
+                        </select>
+                    </label>
+
+                    <label class="payment-label">
+                        Note / Description
+                        <input type="text" id="upiNoteInput" maxlength="80" placeholder="e.g. Monthly hostel fee / Food">
+                    </label>
+
+                    <div class="upi-actions">
+                        <button id="generateUpiBtn" class="primary-btn" type="button">Generate QR &amp; Pay</button>
+                        <a id="upiPayBtn" class="secondary-btn" href="#" style="display:none;" rel="noopener">Open UPI App</a>
+                    </div>
+
+                    <div id="upiQrBox" class="upi-qr-box">
+                        <div id="upiQr"></div>
+                        <span id="upiQrPlaceholder">Enter amount and click Generate QR</span>
+
+                        <!-- UPI Payment Actions & Status -->
+                        <div id="upiAutoTracker" class="upi-auto-tracker" style="display: none;">
+                            <div class="upi-auto-status">
+                                <span class="pulse-indicator"></span>
+                                <strong id="upiAutoStatusText">Scan QR in PhonePe / GPay / Paytm to pay</strong>
+                            </div>
+                            <div class="upi-auto-details" id="upiAutoDetails"></div>
+                            <div class="upi-auto-actions" style="display:flex; flex-direction:column; gap:8px; width:100%;">
+                                <button id="simulatePaidBtn" class="primary-btn auto-paid-btn" type="button" style="width:100%; justify-content:center; font-size:0.92rem; padding:12px 16px; font-weight:700;">
+                                    ⚡ I Have Paid — Auto-Record Now
+                                </button>
+                                <button id="cancelUpiBtn" class="secondary-btn cancel-upi-btn" type="button" style="width:100%; justify-content:center;">
+                                    ✕ Cancel / New QR
+                                </button>
+                            </div>
+                            <small style="color: rgba(255,255,255,0.6); text-align: center; font-size: 0.78rem; display:block; margin-top:2px;">
+                                Pay on your phone, then click "⚡ I Have Paid" — it will auto-record to Tracker &amp; Expenses instantly!
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="panel payment-card tracker-card">
+                <div class="payment-card-title">
+                    <div>
+                        <p class="small-label">PAYMENT TRACKER</p>
+                        <h3>Record a UPI Payment</h3>
+                    </div>
+                    <span>🧾</span>
+                </div>
+
+                <!-- Auto-Fill Banner -->
+                <div id="paymentAutoFillBanner" class="payment-autofill-banner" style="display: none;">
+                    <div class="autofill-badge-left">
+                        <span class="autofill-sparkle">✨</span>
+                        <div>
+                            <strong>Details Auto-Filled from UPI Payment</strong>
+                            <small id="autoFillDetailsText">Amount, Title, Category &amp; UTR auto-populated</small>
+                        </div>
+                    </div>
+                    <button type="button" id="clearAutoFillBtn" class="autofill-clear-btn" title="Reset form">Reset</button>
+                </div>
+
+                <form id="paymentForm" class="payment-form-grid">
+
+                    <label class="payment-label">
+                        Payment Title
+                        <input type="text" id="paymentTitle" placeholder="e.g. Electricity Bill" required>
+                    </label>
+
+                    <label class="payment-label">
+                        Amount
+                        <input type="number" id="paymentAmount" min="1" step="0.01" placeholder="₹ 500" required>
+                    </label>
+
+                    <label class="payment-label">
+                        Category
+                        <select id="paymentCategory" required>
+                            <option value="">Select category</option>
+                            <option value="Education">📚 Education</option>
+                            <option value="Bills">💡 Bills</option>
+                            <option value="Food">🍔 Food</option>
+                            <option value="Travel">🚌 Travel</option>
+                            <option value="Shopping">🛍️ Shopping</option>
+                            <option value="Entertainment">🎮 Entertainment</option>
+                            <option value="Other">📦 Other</option>
+                        </select>
+                    </label>
+
+                    <label class="payment-label">
+                        UPI Reference / UTR (12 Digits)
+                        <div class="utr-input-group">
+                            <input type="text" id="paymentUtr" placeholder="e.g. 426912345678 (From GPay / PhonePe)" maxlength="20">
+                            <button type="button" id="pasteSmsBtn" class="utr-paste-btn" title="Paste Bank SMS or UPI message to extract real UTR">📋 Paste SMS</button>
+                        </div>
+                        <small class="utr-helper-text">Original 12-digit UTR bank SMS ya PhonePe/GPay transaction receipt par hota hai</small>
+                    </label>
+
+                    <label class="payment-label">
+                        Date
+                        <input type="date" id="paymentDate" required>
+                    </label>
+
+                    <label class="payment-label payment-upload-label">
+                        Payment Proof / Screenshot
+                        <input type="file" id="paymentProof" accept="image/*,.pdf">
+                        <small id="proofOcrStatus">Upload PhonePe/GPay screenshot to auto-scan original UTR 📸</small>
+                    </label>
+
+                    <label class="payment-confirm-check" for="paymentCompleted">
+                        <input type="checkbox" id="paymentCompleted">
+                        <span>
+                            <strong>I have completed this payment</strong>
+                            <small>Check only after your UPI app shows success. FinAI will add it to Expenses.</small>
+                        </span>
+                    </label>
+
+                    <div class="payment-form-submit">
+                        <button class="primary-btn" type="submit">➕ Save Payment</button>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="payment-stats-grid">
+                <div class="payment-stat"><span>💰</span><div><small>Total Paid</small><strong id="paymentTotal">₹0</strong></div></div>
+                <div class="payment-stat"><span>📅</span><div><small>This Month</small><strong id="paymentMonthTotal">₹0</strong></div></div>
+                <div class="payment-stat"><span>🧾</span><div><small>Transactions</small><strong id="paymentCount">0</strong></div></div>
+                <div class="payment-stat"><span>📎</span><div><small>Proofs Uploaded</small><strong id="paymentProofCount">0</strong></div></div>
+            </div>
+
+            <div class="panel payment-card">
+                <div class="payment-card-title">
+                    <div>
+                        <p class="small-label">HISTORY</p>
+                        <h3>Recent UPI Transactions</h3>
+                    </div>
+                </div>
+                <div id="paymentsList" class="payments-list">
+                    <div class="empty-state">No UPI payments recorded yet.</div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- =========================
+             AI
+        ========================== -->
+
+        <section
+            id="ai"
+            class="section"
+        >
+
+            <div class="ai-header">
+
+                <div class="ai-avatar">
+                    🤖
+                </div>
+
+
+                <div>
+
+                    <p class="small-label">
+                        SMART FINANCE
+                    </p>
+
+                    <h2>
+                        Finance AI Advisor
+                    </h2>
+
+                    <p>
+                        Get personalized suggestions based on your spending.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="ai-grid">
+
+                <div class="panel ai-chat">
+
+                    <div
+                        id="aiMessages"
+                        class="ai-messages"
+                    >
+
+                        <div class="message ai">
+
+                            <div class="message-avatar">
+                                🤖
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Finance AI
+                                </strong>
+
+                                <p>
+                                    Hey! I'm your Student Finance AI.
+                                    Click "Analyze My Finances" to get
+                                    a personalized financial analysis.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        id="analyzeBtn"
+                        class="primary-btn full-btn"
+                    >
+                        ✨ Analyze My Finances
+                    </button>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <h3>
+                        Financial Health
+                    </h3>
+
+
+                    <div class="health-score">
+
+                        <div class="score-ring">
+
+                            <span id="aiScore">
+                                0
+                            </span>
+
+                        </div>
+
+
+                        <strong id="scoreLabel">
+                            Waiting for analysis
+                        </strong>
+
+                    </div>
+
+
+                    <div
+                        id="aiInsights"
+                        class="insights"
+                    >
+
+                        <div class="empty-state">
+                            Your AI insights will appear here.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUICK QUESTIONS -->
+
+            <div class="panel quick-panel">
+
+                <h3>
+                    Quick Questions
+                </h3>
+
+
+                <div class="quick-buttons">
+
+                    <button
+                        data-question="How can I save more money?"
+                    >
+                        💰 How can I save more?
+                    </button>
+
+
+                    <button
+                        data-question="Am I spending too much?"
+                    >
+                        📊 Am I spending too much?
+                    </button>
+
+
+                    <button
+                        data-question="Give me a student budget plan."
+                    >
+                        🎓 Give me a budget plan
+                    </button>
+
+
+                    <button
+                        data-question="How much should I save?"
+                    >
+                        🏦 How much should I save?
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ASK YOUR OWN QUESTION -->
+
+            <form
+                id="aiQuestionForm"
+                class="panel ai-question-panel"
+            >
+
+                <div class="ai-question-heading">
+                    <div>
+                        <p class="small-label">ASK FINANCE AI</p>
+                        <h3>Have your own question?</h3>
+                        <p>Write a question about your spending, saving or budget.</p>
+                    </div>
+                    <span class="ai-question-icon" aria-hidden="true">✍️</span>
+                </div>
+
+                <div class="ai-question-row">
+                    <label
+                        class="sr-only"
+                        for="aiQuestionInput"
+                    >
+                        Write your finance question
+                    </label>
+
+                    <textarea
+                        id="aiQuestionInput"
+                        name="question"
+                        rows="2"
+                        maxlength="500"
+                        placeholder="e.g. How can I reduce my food expenses this month?"
+                        required
+                    ></textarea>
+
+                    <button
+                        type="submit"
+                        class="primary-btn ai-question-submit"
+                    >
+                        <span>Ask AI</span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+
+                <div class="ai-question-meta">
+                    <span>Tip: Include your income, budget or expense category for a better answer.</span>
+                    <span id="aiQuestionCount">0/500</span>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         EXPENSE MODAL
+    ========================== -->
+
+    <div
+        id="expenseModal"
+        class="modal"
+    >
+
+        <div class="modal-box">
+
+            <button
+                class="modal-close"
+                id="closeExpenseModal"
+            >
+                ×
+            </button>
+
+
+            <h2>
+                Add Expense
+            </h2>
+
+            <p>
+                Record your latest spending.
+            </p>
+
+
+            <form id="expenseForm">
+
+                <div id="expenseAutoFillPrompt" class="expense-autofill-chip" style="display: none;">
+                    <span>✨ Auto-fill from recent UPI payment?</span>
+                    <button type="button" id="useRecentPaymentBtn" class="use-payment-chip-btn">Fill Details</button>
+                </div>
+
+                <label>
+
+                    Expense Name
+
+                    <input
+                        type="text"
+                        id="expenseName"
+                        placeholder="e.g. College Canteen"
+                        required
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Amount
+
+                    <input
+                        type="number"
+                        id="expenseAmount"
+                        placeholder="₹"
+                        min="1"
+                        required
+                    >
+                    <small id="expenseAmountHint" style="font-size: 0.78rem; color: #94a3b8; display: block; margin-top: 4px;"></small>
+
+                </label>
+
+
+                <label>
+
+                    Category
+
+                    <select
+                        id="expenseCategory"
+                        required
+                    >
+
+                        <option value="">
+                            Select category
+                        </option>
+
+                        <option value="Food">
+                            🍔 Food
+                        </option>
+
+                        <option value="Education">
+                            📚 Education
+                        </option>
+
+                        <option value="Travel">
+                            🚌 Travel
+                        </option>
+
+                        <option value="Entertainment">
+                            🎮 Entertainment
+                        </option>
+
+                        <option value="Shopping">
+                            🛍️ Shopping
+                        </option>
+
+                        <option value="Bills">
+                            💡 Bills
+                        </option>
+
+                        <option value="Other">
+                            📦 Other
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+                <label>
+
+                    Date
+
+                    <input
+                        type="date"
+                        id="expenseDate"
+                        required
+                    >
+
+                </label>
+
+
+                <button
+                    class="primary-btn full-btn"
+                    type="submit"
+                >
+                    Add Expense
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         TOAST
+    ========================== -->
+
+    <div
+        id="toast"
+        class="toast"
+    >
+
+        <span id="toastIcon">
+            ✓
+        </span>
+
+        <span id="toastText">
+            Done
+        </span>
+
+    </div>
+
+
+    <!-- SMS / UPI Text Paste Modal -->
+    <div id="smsModal" class="auth-modal" style="display: none;">
+        <div class="auth-card" style="max-width: 440px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 1.1rem;">📋 Paste Bank SMS / UPI Message</h3>
+                <button type="button" id="closeSmsModal" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: inherit; line-height: 1;">&times;</button>
+            </div>
+            <p style="font-size: 0.82rem; opacity: 0.8; margin: 0 0 14px; line-height: 1.5;">
+                Apne bank ka SMS ya PhonePe/GPay ka message yahan paste karein. FinAI automatically original 12-digit UTR, Amount aur Date nikal lega.
+            </p>
+            <textarea id="smsTextInput" rows="4" style="width: 100%; box-sizing: border-box; border-radius: 10px; padding: 12px; font-family: inherit; font-size: 0.85rem; border: 1px solid rgba(127,127,127,0.3); background: rgba(127,127,127,0.05); color: inherit;" placeholder="e.g. Sent Rs.500 from SBI A/c to Canteen via UPI Ref no 426918293847 on 26-09-24..."></textarea>
+            <div style="display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end;">
+                <button type="button" id="cancelSmsBtn" class="secondary-btn" style="padding: 8px 16px;">Cancel</button>
+                <button type="button" id="extractSmsBtn" class="primary-btn" style="padding: 8px 18px;">✨ Extract Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script type="module" src="./script.js"></script>
+
+</body>
+</html>
