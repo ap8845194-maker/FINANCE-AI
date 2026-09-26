@@ -52,8 +52,16 @@ Start the backend server:
 ```bash
 npm start
 ```
-The server will run on `http://127.0.0.1:5501` (or your configured port).
+The server will run on `http://127.0.0.1:5500` (or your configured port).
 Open `index.html` in your browser or serve it via Live Server.
+
+---
+
+## 🌐 Running on GitHub Pages
+
+Since GitHub Pages only serves static files and does not run a Node.js backend:
+- **Direct Groq AI**: Click **⚙️ AI Setup** inside the app on GitHub Pages and enter your Groq API key once. It will be stored safely in your browser's `localStorage` and call Groq directly.
+- **Custom Backend**: You can also deploy `server.js` to a free provider like [Render](https://render.com) and set your backend URL in **⚙️ AI Setup**.
 
 ---
 

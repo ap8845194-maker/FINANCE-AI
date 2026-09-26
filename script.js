@@ -2226,30 +2226,37 @@ async function markPaymentComplete(id) {
         showToast("Verifying payment and adding expense...", "⏳");
 
         const idToken = await currentUser.getIdToken();
-        const backendUrl = window.FINAI_BACKEND_URL || "";
+        const backendUrl = (typeof getStoredBackendUrl === "function" ? getStoredBackendUrl() : (window.FINAI_BACKEND_URL || ""));
 
-        const response = await fetch(`${backendUrl}/api/upi/complete`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${idToken}`
-            },
-            body: JSON.stringify({
-                payment: {
-                    id: payment.id,
-                    title: payment.title || "UPI Payment",
-                    amount: Number(payment.amount || 0),
-                    category: payment.category || "Other",
-                    date: payment.date || new Date().toISOString().slice(0, 10),
-                    utr: payment.utr || ""
-                }
-            })
-        });
+        let result = {};
+        try {
+            const response = await fetch(`${backendUrl}/api/upi/complete`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    payment: {
+                        id: payment.id,
+                        title: payment.title || "UPI Payment",
+                        amount: Number(payment.amount || 0),
+                        category: payment.category || "Other",
+                        date: payment.date || new Date().toISOString().slice(0, 10),
+                        utr: payment.utr || ""
+                    }
+                })
+            });
 
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-            throw new Error(result.error || "Backend could not verify the payment.");
+            if (response.ok) {
+                result = await response.json().catch(() => ({}));
+            } else if (response.status !== 404) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || "Backend could not verify the payment.");
+            }
+        } catch (fetchErr) {
+            // When hosted on GitHub Pages or offline, fallback to client-side complete
+            console.warn("Backend unavailable, completing payment in browser:", fetchErr.message);
         }
 
         const confirmedPayment = result.payment || {
@@ -3345,6 +3352,189 @@ function showUserQuestion(text) {
 
 }
 
+/* ==========================================
+   AI INTELLIGENCE & GROQ CONFIGURATION
+========================================== */
+
+function getStoredGroqKey() {
+    return (localStorage.getItem("FINAI_GROQ_KEY") || window.FINAI_GROQ_KEY || "").trim();
+}
+
+function getStoredGroqModel() {
+    return (localStorage.getItem("FINAI_GROQ_MODEL") || "llama-3.3-70b-versatile").trim();
+}
+
+function getStoredBackendUrl() {
+    const fromStorage = (localStorage.getItem("FINAI_BACKEND_URL") || "").trim();
+    if (fromStorage) return fromStorage.replace(/\/+$/, "");
+    if (window.FINAI_BACKEND_URL) return String(window.FINAI_BACKEND_URL).trim().replace(/\/+$/, "");
+    return "";
+}
+
+let pendingAiQuestion = null;
+
+function openAiSettingsModal(pendingQ = null) {
+    if (pendingQ) {
+        pendingAiQuestion = pendingQ;
+    }
+    const modal = document.getElementById("aiSettingsModal");
+    if (!modal) return;
+
+    const keyInput = document.getElementById("aiGroqApiKeyInput");
+    const modelSelect = document.getElementById("aiGroqModelSelect");
+    const backendInput = document.getElementById("aiBackendUrlInput");
+
+    if (keyInput) keyInput.value = getStoredGroqKey();
+    if (modelSelect) modelSelect.value = getStoredGroqModel();
+    if (backendInput) backendInput.value = getStoredBackendUrl();
+
+    modal.classList.add("show");
+    setTimeout(() => {
+        if (keyInput && !keyInput.value) keyInput.focus();
+    }, 150);
+}
+
+function closeAiSettingsModal() {
+    const modal = document.getElementById("aiSettingsModal");
+    if (modal) modal.classList.remove("show");
+}
+
+const openAiSettingsBtn = document.getElementById("openAiSettingsBtn");
+const closeAiSettingsModalBtn = document.getElementById("closeAiSettingsModal");
+const aiSettingsModal = document.getElementById("aiSettingsModal");
+const aiSettingsForm = document.getElementById("aiSettingsForm");
+const clearAiSettingsBtn = document.getElementById("clearAiSettingsBtn");
+
+if (openAiSettingsBtn) {
+    openAiSettingsBtn.addEventListener("click", () => openAiSettingsModal());
+}
+
+if (closeAiSettingsModalBtn) {
+    closeAiSettingsModalBtn.addEventListener("click", closeAiSettingsModal);
+}
+
+if (aiSettingsModal) {
+    aiSettingsModal.addEventListener("click", event => {
+        if (event.target === aiSettingsModal) {
+            closeAiSettingsModal();
+        }
+    });
+}
+
+if (aiSettingsForm) {
+    aiSettingsForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const keyInput = document.getElementById("aiGroqApiKeyInput");
+        const modelSelect = document.getElementById("aiGroqModelSelect");
+        const backendInput = document.getElementById("aiBackendUrlInput");
+
+        const key = keyInput ? keyInput.value.trim() : "";
+        const model = modelSelect ? modelSelect.value.trim() : "llama-3.3-70b-versatile";
+        const backend = backendInput ? backendInput.value.trim() : "";
+
+        if (key) {
+            localStorage.setItem("FINAI_GROQ_KEY", key);
+        } else {
+            localStorage.removeItem("FINAI_GROQ_KEY");
+        }
+
+        if (model) {
+            localStorage.setItem("FINAI_GROQ_MODEL", model);
+        }
+
+        if (backend) {
+            localStorage.setItem("FINAI_BACKEND_URL", backend);
+        } else {
+            localStorage.removeItem("FINAI_BACKEND_URL");
+        }
+
+        closeAiSettingsModal();
+        showToast("AI configuration saved! 🚀", "✓");
+
+        if (pendingAiQuestion) {
+            const q = pendingAiQuestion;
+            pendingAiQuestion = null;
+            answerCustomQuestion(q);
+        }
+    });
+}
+
+if (clearAiSettingsBtn) {
+    clearAiSettingsBtn.addEventListener("click", () => {
+        localStorage.removeItem("FINAI_GROQ_KEY");
+        localStorage.removeItem("FINAI_GROQ_MODEL");
+        localStorage.removeItem("FINAI_BACKEND_URL");
+
+        const keyInput = document.getElementById("aiGroqApiKeyInput");
+        const backendInput = document.getElementById("aiBackendUrlInput");
+        if (keyInput) keyInput.value = "";
+        if (backendInput) backendInput.value = "";
+
+        showToast("AI settings reset", "ℹ️");
+    });
+}
+
+async function askGroqDirect(question, finance, expensesList) {
+    const key = getStoredGroqKey();
+    if (!key) {
+        throw new Error("GROQ_KEY_REQUIRED");
+    }
+
+    const safeExpenses = Array.isArray(expensesList) ? expensesList.slice(0, 50) : [];
+    const cleanedExpenses = safeExpenses.map(item => ({
+        title: String(item?.title || item?.name || "Expense").slice(0, 60),
+        category: String(item?.category || "Other").slice(0, 30),
+        amount: Number(item?.amount || 0),
+        date: String(item?.date || "").slice(0, 20)
+    }));
+
+    const financeContext = {
+        income: Number(finance?.income || 0),
+        budget: Number(finance?.budget || 0),
+        goal: Number(finance?.goal || 0),
+        expenses: cleanedExpenses,
+        totalExpenses: cleanedExpenses.reduce((sum, item) => sum + item.amount, 0)
+    };
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${key}`
+        },
+        body: JSON.stringify({
+            model: getStoredGroqModel(),
+            temperature: 0.4,
+            max_tokens: 450,
+            messages: [
+                {
+                    role: "system",
+                    content: [
+                        "You are FinAI, an expert student personal finance assistant.",
+                        "Provide practical, concise, encouraging advice tailored to the student's financial situation.",
+                        "Use Indian rupees (₹) when mentioning amounts.",
+                        "Keep responses under 150 words. Use bullet points or short paragraphs.",
+                        `Student Financial Context (JSON): ${JSON.stringify(financeContext)}`
+                    ].join("\n")
+                },
+                { role: "user", content: question }
+            ]
+        })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        const msg = data?.error?.message || "Groq API request failed.";
+        throw new Error(msg);
+    }
+
+    const text = data?.choices?.[0]?.message?.content?.trim();
+    if (!text) {
+        throw new Error("Groq returned an empty response.");
+    }
+    return text;
+}
+
 async function answerCustomQuestion(question) {
 
     const submitButton =
@@ -3361,35 +3551,63 @@ async function answerCustomQuestion(question) {
     }
 
     try {
+        let answer = null;
+        const backendUrl = getStoredBackendUrl();
+        const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const hasExplicitBackend = Boolean(backendUrl);
 
-        const backendUrl = window.FINAI_BACKEND_URL || "";
-        const response =
-            await fetch(`${backendUrl}/api/ask`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    question,
-                    finance: financeData,
-                    expenses
-                })
-            });
+        // 1. Try Backend if configured or running locally
+        if (isLocalhost || hasExplicitBackend) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        const data =
-            await response.json()
-                .catch(() => ({}));
+                const response = await fetch(`${backendUrl}/api/ask`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        question,
+                        finance: financeData,
+                        expenses
+                    })
+                });
+                clearTimeout(timeoutId);
 
-        if (!response.ok) {
-            throw new Error(
-                data.error ||
-                "Unable to get an AI response."
-            );
+                if (response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    if (data && data.answer) {
+                        answer = data.answer;
+                    }
+                } else if (hasExplicitBackend) {
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data?.error || `Backend returned status ${response.status}`);
+                }
+            } catch (err) {
+                // If backend was explicitly specified and failed, or local without direct key
+                if (hasExplicitBackend && !getStoredGroqKey()) {
+                    throw err;
+                }
+            }
         }
 
-        showAIResponse(
-            data.answer
-        );
+        // 2. Fallback to Direct In-Browser Groq
+        if (!answer) {
+            try {
+                answer = await askGroqDirect(question, financeData, expenses);
+            } catch (directErr) {
+                if (directErr.message === "GROQ_KEY_REQUIRED") {
+                    showAIResponse(
+                        "💡 **GitHub Pages Setup Required:** GitHub Pages par backend server nahi hota. Direct Groq AI chalane ke liye upar '⚙️ AI Setup' button par click karke apna Groq API key enter karein."
+                    );
+                    openAiSettingsModal(question);
+                    return;
+                }
+                throw directErr;
+            }
+        }
+
+        showAIResponse(answer);
 
     } catch (error) {
 
@@ -3399,9 +3617,9 @@ async function answerCustomQuestion(question) {
         );
 
         showAIResponse(
-            error.message.includes("GROQ_API_KEY") || error.message.includes("OPENAI_API_KEY")
-                ? "Groq is not configured yet. Add your API key to the server's .env file."
-                : "I could not reach the AI server right now. Please check that you started the app with npm start and try again."
+            error.message.includes("GROQ_API_KEY") || error.message.includes("API key") || error.message.includes("401")
+                ? "Groq API key issue. '⚙️ AI Setup' par click karke apna valid Groq key check karein."
+                : `AI connect nahi ho paya: ${error.message || "Please check server or AI setup."}`
         );
 
     } finally {

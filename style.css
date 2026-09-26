@@ -4564,3 +4564,138 @@ button:disabled {
 .message p {
     white-space: pre-line;
 }
+
+/* =========================================================
+   AI SETTINGS MODAL & BUTTON
+   ========================================================= */
+
+.ai-settings-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    background: rgba(124, 92, 255, 0.12);
+    color: var(--primary, #7c5cff);
+    border: 1px solid rgba(124, 92, 255, 0.28);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.ai-settings-toggle-btn:hover {
+    background: rgba(124, 92, 255, 0.22);
+    border-color: rgba(124, 92, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+.ai-settings-box {
+    max-width: 480px;
+    width: 90%;
+}
+
+.ai-settings-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(124, 92, 255, 0.14);
+    color: var(--primary, #7c5cff);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.ai-settings-modal-header h2 {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.ai-settings-modal-header p {
+    color: var(--muted, #94a3b8);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.ai-settings-box label {
+    display: block;
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color, #e2e8f0);
+}
+
+.ai-settings-box .field-sub {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted, #94a3b8);
+    margin-top: 2px;
+    margin-bottom: 6px;
+}
+
+.ai-settings-box input,
+.ai-settings-box select {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: var(--input-bg, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    color: var(--text-color, #f8fafc);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.ai-settings-box input:focus,
+.ai-settings-box select:focus {
+    border-color: var(--primary, #7c5cff);
+}
+
+.ai-settings-help-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-top: 6px;
+    color: var(--muted, #94a3b8);
+}
+
+.ai-settings-help-row a {
+    color: var(--primary, #7c5cff);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.ai-settings-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.ai-settings-actions .primary-btn {
+    flex: 1;
+}
+
+.ghost-btn {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+    color: var(--muted, #94a3b8);
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ghost-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color, #fff);
+}
+
