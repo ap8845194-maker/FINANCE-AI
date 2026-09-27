@@ -57,11 +57,11 @@ Open `index.html` in your browser or serve it via Live Server.
 
 ---
 
-## 🌐 Running on GitHub Pages
+## 🌐 Zero-Config GitHub Pages Support (100% Free for Visitors)
 
-Since GitHub Pages only serves static files and does not run a Node.js backend:
-- **Direct Groq AI**: Click **⚙️ AI Setup** inside the app on GitHub Pages and enter your Groq API key once. It will be stored safely in your browser's `localStorage` and call Groq directly.
-- **Custom Backend**: You can also deploy `server.js` to a free provider like [Render](https://render.com) and set your backend URL in **⚙️ AI Setup**.
+FinAI runs directly in any browser on GitHub Pages with **Zero Setup**:
+- **Built-in FinAI Native Engine**: Visitors and customers do **NOT** need any API key or backend! FinAI analyzes live student income, category breakdowns (Food, Travel, Shopping, etc.), and savings rates right inside the browser.
+- **Optional Developer Mode**: Developers who wish to plug in their own personal Groq Cloud API key or custom backend server (Render/Vercel) can optionally do so via the **⚙️ AI Setup** button.
 
 ---
 

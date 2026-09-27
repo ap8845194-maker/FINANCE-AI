@@ -3010,8 +3010,50 @@ function getCategoryTotals() {
 
 
 /* ==========================================
-   AI MESSAGE
+   AI MESSAGE FORMATTING & DISPLAY
 ========================================== */
+
+function formatAiContent(text) {
+    if (!text) return "";
+    const escaped = escapeHTML(text);
+    const formattedInline = escaped
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+    const lines = formattedInline.split(/\r?\n/);
+    let outputHtml = "";
+    let currentList = [];
+
+    const flushList = () => {
+        if (currentList.length > 0) {
+            outputHtml += `<ul class="ai-bullet-list">${currentList.map(item => `<li>${item}</li>`).join("")}</ul>`;
+            currentList = [];
+        }
+    };
+
+    lines.forEach(rawLine => {
+        const line = rawLine.trim();
+        if (!line) {
+            flushList();
+            return;
+        }
+
+        const bulletMatch = line.match(/^[-*•]\s+(.*)$/);
+        const numberMatch = line.match(/^(\d+[\.\)])\s+(.*)$/);
+
+        if (bulletMatch) {
+            currentList.push(bulletMatch[1]);
+        } else if (numberMatch) {
+            currentList.push(`<strong>${numberMatch[1]}</strong> ${numberMatch[2]}`);
+        } else {
+            flushList();
+            outputHtml += `<p class="ai-p">${line}</p>`;
+        }
+    });
+
+    flushList();
+    return outputHtml || `<p class="ai-p">${formattedInline}</p>`;
+}
 
 function showAIResponse(text) {
 
@@ -3036,17 +3078,17 @@ function showAIResponse(text) {
             🤖
         </div>
 
-        <div>
+        <div class="ai-message-content">
 
             <strong>
                 Finance AI
             </strong>
 
-            <p>
+            <div class="ai-response-body">
                 ${
-                    escapeHTML(text)
+                    formatAiContent(text)
                 }
-            </p>
+            </div>
 
         </div>
 
@@ -3204,11 +3246,9 @@ document
         button.addEventListener(
             "click",
             () => {
-
-                answerQuickQuestion(
-                    button.dataset.question
-                );
-
+                const q = button.dataset.question;
+                if (!q) return;
+                answerQuickQuestion(q);
             }
         );
 
@@ -3216,87 +3256,9 @@ document
 
 
 function answerQuickQuestion(question) {
-
-    const income =
-        Number(
-            financeData.income || 0
-        );
-
-    const total =
-        getTotalExpenses();
-
-    const savings =
-        income - total;
-
-    let answer = "";
-
-    if (
-        question.includes(
-            "save more"
-        )
-    ) {
-
-        answer =
-            "Start by identifying your biggest spending category. Try reducing one non-essential expense and move the saved amount toward your savings goal.";
-
-    } else if (
-        question.includes(
-            "spending too much"
-        )
-    ) {
-
-        if (income <= 0) {
-
-            answer =
-                "Add your monthly income first. Then I can compare your expenses with your available money.";
-
-        } else {
-
-            const rate =
-                (total / income) * 100;
-
-            answer =
-                `Your recorded expenses use about ${
-                    Math.round(rate)
-                }% of your monthly income.`;
-
-        }
-
-    } else if (
-        question.includes(
-            "budget plan"
-        )
-    ) {
-
-        answer =
-            "A simple student budget can start with essential expenses first, then savings, and finally discretionary spending.";
-
-    } else if (
-        question.includes(
-            "How much should I save"
-        )
-    ) {
-
-        if (income > 0) {
-
-            answer =
-                `Based on your current income of ${
-                    money(income)
-                }, you could start by targeting around 10–20% if your essential expenses allow it.`;
-
-        } else {
-
-            answer =
-                "Add your monthly income first.";
-
-        }
-
-    }
-
-    showAIResponse(
-        answer
-    );
-
+    if (!question) return;
+    showUserQuestion(question);
+    answerCustomQuestion(question);
 }
 
 
@@ -3372,6 +3334,73 @@ function getStoredBackendUrl() {
 }
 
 let pendingAiQuestion = null;
+let aiAutoSaveDebounceTimer = null;
+
+function updateAiAutoSaveBadge(state) {
+    const indicator = document.getElementById("aiAutoSaveIndicator");
+    const textEl = document.getElementById("aiAutoSaveText");
+    if (!textEl) return;
+
+    if (state === "saving") {
+        if (indicator) {
+            indicator.classList.remove("saved", "reset");
+            indicator.classList.add("saving");
+        }
+        textEl.textContent = "Saving... ⏳";
+    } else if (state === "reset") {
+        if (indicator) {
+            indicator.classList.remove("saving", "saved");
+            indicator.classList.add("reset");
+        }
+        textEl.textContent = "Default settings reset ✓";
+    } else {
+        if (indicator) {
+            indicator.classList.remove("saving", "reset");
+            indicator.classList.add("saved");
+        }
+        textEl.textContent = "Auto-saved ✓ (Save dabane ki zaroorat nahi hai)";
+    }
+}
+
+function saveAiSettingsAutomatically(showFeedback = true) {
+    const keyInput = document.getElementById("aiGroqApiKeyInput");
+    const modelSelect = document.getElementById("aiGroqModelSelect");
+    const backendInput = document.getElementById("aiBackendUrlInput");
+
+    if (!keyInput && !modelSelect && !backendInput) return;
+
+    const key = keyInput ? keyInput.value.trim() : "";
+    const model = modelSelect ? modelSelect.value.trim() : "llama-3.3-70b-versatile";
+    const backend = backendInput ? backendInput.value.trim() : "";
+
+    if (key) {
+        localStorage.setItem("FINAI_GROQ_KEY", key);
+    } else {
+        localStorage.removeItem("FINAI_GROQ_KEY");
+    }
+
+    if (model) {
+        localStorage.setItem("FINAI_GROQ_MODEL", model);
+    }
+
+    if (backend) {
+        localStorage.setItem("FINAI_BACKEND_URL", backend);
+    } else {
+        localStorage.removeItem("FINAI_BACKEND_URL");
+    }
+
+    if (showFeedback) {
+        updateAiAutoSaveBadge("saved");
+    }
+}
+
+function triggerAiAutoSave() {
+    updateAiAutoSaveBadge("saving");
+    clearTimeout(aiAutoSaveDebounceTimer);
+    aiAutoSaveDebounceTimer = setTimeout(() => {
+        saveAiSettingsAutomatically(true);
+    }, 250);
+}
 
 function openAiSettingsModal(pendingQ = null) {
     if (pendingQ) {
@@ -3388,6 +3417,8 @@ function openAiSettingsModal(pendingQ = null) {
     if (modelSelect) modelSelect.value = getStoredGroqModel();
     if (backendInput) backendInput.value = getStoredBackendUrl();
 
+    updateAiAutoSaveBadge("saved");
+
     modal.classList.add("show");
     setTimeout(() => {
         if (keyInput && !keyInput.value) keyInput.focus();
@@ -3395,8 +3426,19 @@ function openAiSettingsModal(pendingQ = null) {
 }
 
 function closeAiSettingsModal() {
+    clearTimeout(aiAutoSaveDebounceTimer);
+    saveAiSettingsAutomatically(false);
+
     const modal = document.getElementById("aiSettingsModal");
     if (modal) modal.classList.remove("show");
+
+    if (pendingAiQuestion) {
+        const q = pendingAiQuestion;
+        pendingAiQuestion = null;
+        if (typeof answerCustomQuestion === "function") {
+            answerCustomQuestion(q);
+        }
+    }
 }
 
 const openAiSettingsBtn = document.getElementById("openAiSettingsBtn");
@@ -3404,6 +3446,9 @@ const closeAiSettingsModalBtn = document.getElementById("closeAiSettingsModal");
 const aiSettingsModal = document.getElementById("aiSettingsModal");
 const aiSettingsForm = document.getElementById("aiSettingsForm");
 const clearAiSettingsBtn = document.getElementById("clearAiSettingsBtn");
+const aiGroqApiKeyInput = document.getElementById("aiGroqApiKeyInput");
+const aiGroqModelSelect = document.getElementById("aiGroqModelSelect");
+const aiBackendUrlInput = document.getElementById("aiBackendUrlInput");
 
 if (openAiSettingsBtn) {
     openAiSettingsBtn.addEventListener("click", () => openAiSettingsModal());
@@ -3421,41 +3466,42 @@ if (aiSettingsModal) {
     });
 }
 
+// Close on Escape key with auto-save
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && aiSettingsModal && aiSettingsModal.classList.contains("show")) {
+        closeAiSettingsModal();
+    }
+});
+
+// Auto-save on typing, changing, or blurring fields
+if (aiGroqApiKeyInput) {
+    aiGroqApiKeyInput.addEventListener("input", triggerAiAutoSave);
+    aiGroqApiKeyInput.addEventListener("change", () => saveAiSettingsAutomatically(true));
+    aiGroqApiKeyInput.addEventListener("blur", () => saveAiSettingsAutomatically(true));
+}
+
+if (aiGroqModelSelect) {
+    aiGroqModelSelect.addEventListener("change", () => saveAiSettingsAutomatically(true));
+    aiGroqModelSelect.addEventListener("input", () => saveAiSettingsAutomatically(true));
+}
+
+if (aiBackendUrlInput) {
+    aiBackendUrlInput.addEventListener("input", triggerAiAutoSave);
+    aiBackendUrlInput.addEventListener("change", () => saveAiSettingsAutomatically(true));
+    aiBackendUrlInput.addEventListener("blur", () => saveAiSettingsAutomatically(true));
+}
+
+// Ensure saved before window unload / tab close
+window.addEventListener("beforeunload", () => {
+    saveAiSettingsAutomatically(false);
+});
+
 if (aiSettingsForm) {
     aiSettingsForm.addEventListener("submit", event => {
         event.preventDefault();
-        const keyInput = document.getElementById("aiGroqApiKeyInput");
-        const modelSelect = document.getElementById("aiGroqModelSelect");
-        const backendInput = document.getElementById("aiBackendUrlInput");
-
-        const key = keyInput ? keyInput.value.trim() : "";
-        const model = modelSelect ? modelSelect.value.trim() : "llama-3.3-70b-versatile";
-        const backend = backendInput ? backendInput.value.trim() : "";
-
-        if (key) {
-            localStorage.setItem("FINAI_GROQ_KEY", key);
-        } else {
-            localStorage.removeItem("FINAI_GROQ_KEY");
-        }
-
-        if (model) {
-            localStorage.setItem("FINAI_GROQ_MODEL", model);
-        }
-
-        if (backend) {
-            localStorage.setItem("FINAI_BACKEND_URL", backend);
-        } else {
-            localStorage.removeItem("FINAI_BACKEND_URL");
-        }
-
+        saveAiSettingsAutomatically(false);
         closeAiSettingsModal();
         showToast("AI configuration saved! 🚀", "✓");
-
-        if (pendingAiQuestion) {
-            const q = pendingAiQuestion;
-            pendingAiQuestion = null;
-            answerCustomQuestion(q);
-        }
     });
 }
 
@@ -3465,19 +3511,328 @@ if (clearAiSettingsBtn) {
         localStorage.removeItem("FINAI_GROQ_MODEL");
         localStorage.removeItem("FINAI_BACKEND_URL");
 
-        const keyInput = document.getElementById("aiGroqApiKeyInput");
-        const backendInput = document.getElementById("aiBackendUrlInput");
-        if (keyInput) keyInput.value = "";
-        if (backendInput) backendInput.value = "";
+        if (aiGroqApiKeyInput) aiGroqApiKeyInput.value = "";
+        if (aiBackendUrlInput) aiBackendUrlInput.value = "";
+        if (aiGroqModelSelect) aiGroqModelSelect.value = "llama-3.3-70b-versatile";
 
+        updateAiAutoSaveBadge("reset");
         showToast("AI settings reset", "ℹ️");
     });
+}
+
+/* =========================================================
+   BUILT-IN SMART STUDENT FINANCIAL AI ENGINE (GITHUB PAGES NATIVE)
+   Runs 100% locally in browser without requiring any API keys or backend server!
+   ========================================================= */
+
+function generateFinAiAdvice(question, finance, expensesList) {
+    const q = String(question || "").toLowerCase().trim();
+    const income = Number(finance?.income || 0);
+    const budget = Number(finance?.budget || 0);
+    const goal = Number(finance?.goal || 0);
+    const safeExpenses = Array.isArray(expensesList) ? expensesList : [];
+    const totalExpenses = safeExpenses.reduce((sum, item) => sum + (Number(item?.amount) || 0), 0);
+    const netSavings = income - totalExpenses;
+    const savingsRate = income > 0 ? Math.round((netSavings / income) * 100) : 0;
+    const spendRate = income > 0 ? Math.round((totalExpenses / income) * 100) : 0;
+
+    // Category breakdown
+    const categoryTotals = {};
+    safeExpenses.forEach(exp => {
+        const cat = String(exp?.category || "Other").trim();
+        categoryTotals[cat] = (categoryTotals[cat] || 0) + (Number(exp?.amount) || 0);
+    });
+
+    let topCat = "General Expenses";
+    let topCatAmount = 0;
+    Object.entries(categoryTotals).forEach(([cat, amt]) => {
+        if (amt > topCatAmount) {
+            topCatAmount = amt;
+            topCat = cat;
+        }
+    });
+    const topCatPercent = totalExpenses > 0 ? Math.round((topCatAmount / totalExpenses) * 100) : 0;
+
+    const foodSpent = categoryTotals["Food"] || 0;
+    const travelSpent = categoryTotals["Travel"] || 0;
+    const shoppingSpent = categoryTotals["Shopping"] || 0;
+    const entertainmentSpent = categoryTotals["Entertainment"] || 0;
+    const billsSpent = categoryTotals["Bills"] || 0;
+    const eduSpent = categoryTotals["Education"] || 0;
+
+    const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
+
+    // 1. GREETINGS & INTRO
+    if (q === "hi" || q === "hello" || q === "hey" || q.startsWith("hello") || q.startsWith("hi ") || q.includes("kaise ho") || q.includes("who are you") || q.includes("help")) {
+        let intro = `👋 **Hey! I am FinAI, your Personal Student Finance Advisor.**\n\n`;
+        if (income > 0) {
+            intro += `• **Monthly Income/Allowance:** ${inr(income)}\n`;
+            intro += `• **Total Expenses:** ${inr(totalExpenses)} across ${safeExpenses.length} transactions\n`;
+            intro += `• **Available Balance:** ${inr(netSavings)} (${savingsRate}% savings rate)\n\n`;
+            intro += `How can I help you today? You can ask me how to save more, create a budget plan, control food/shopping expenses, or invest safely as a student!`;
+        } else {
+            intro += `I help students manage pocket money, save more, cut unnecessary expenses, and budget smartly.\n\n`;
+            intro += `💡 *Tip: Add your Monthly Income in the Budget section so I can calculate your exact rupee allocations!*`;
+        }
+        return intro;
+    }
+
+    // 2. FOOD / CANTEEN / SWIGGY / DINING
+    if (q.includes("food") || q.includes("khana") || q.includes("swiggy") || q.includes("zomato") || q.includes("canteen") || q.includes("cafe") || q.includes("restaurant") || q.includes("mess") || q.includes("dining") || q.includes("snack")) {
+        let msg = `🍽️ **Food & Dining Expense Analysis:**\n\n`;
+        if (foodSpent > 0) {
+            const foodPct = totalExpenses > 0 ? Math.round((foodSpent / totalExpenses) * 100) : 0;
+            msg += `You have spent **${inr(foodSpent)}** on Food (${foodPct}% of your total expenses).\n\n`;
+        } else {
+            msg += `Food is typically the #1 expense for college students.\n\n`;
+        }
+        msg += `**Student Food Saving Hacks:**\n`;
+        msg += `• **Mess & Tiffin First:** Stick to your hostel mess or home meals for 80%+ of meals. Delivery apps add 30-40% extra via packing, surge, and delivery fees.\n`;
+        msg += `• **The 1-Cheat-Meal Rule:** Reserve Swiggy/Zomato or café outings for strictly once a week as a reward.\n`;
+        msg += `• **Hostel Emergency Snacks:** Buy oats, peanut butter, bananas, or bulk biscuits from local wholesale markets for late-night study cravings.\n`;
+        msg += `• **Group Delivery:** If ordering with friends, combine orders onto one bill to split delivery and discount coupons.`;
+        return msg;
+    }
+
+    // 3. TRAVEL / COMMUTE / METRO / PETROL
+    if (q.includes("travel") || q.includes("commute") || q.includes("metro") || q.includes("bus") || q.includes("auto") || q.includes("petrol") || q.includes("rapido") || q.includes("uber") || q.includes("ola") || q.includes("cab") || q.includes("bike")) {
+        let msg = `🚌 **Travel & Commute Optimization:**\n\n`;
+        if (travelSpent > 0) {
+            msg += `Your recorded travel spending is **${inr(travelSpent)}**.\n\n`;
+        }
+        msg += `**How to save on daily college travel:**\n`;
+        msg += `• **Student Concession Pass:** Apply for a student bus pass or metro concession card—this can cut monthly transit costs by 30% to 50%.\n`;
+        msg += `• **Auto/Cab Pooling:** Share rides with college batchmates from metro stations or bus stands instead of taking solo autos.\n`;
+        msg += `• **Active Commute:** Walk or cycle for short distances (<1.5 km) around campus; saves petrol and keeps you fit!`;
+        return msg;
+    }
+
+    // 4. SHOPPING / CLOTHES / E-COMMERCE / IMPULSE BUYING
+    if (q.includes("shopping") || q.includes("cloth") || q.includes("kapde") || q.includes("amazon") || q.includes("flipkart") || q.includes("myntra") || q.includes("shoes") || q.includes("sale") || q.includes("dress")) {
+        let msg = `🛍️ **Smart Shopping & Impulse Control:**\n\n`;
+        if (shoppingSpent > 0) {
+            msg += `You have spent **${inr(shoppingSpent)}** on Shopping this month.\n\n`;
+        }
+        msg += `**Rules to prevent impulse shopping:**\n`;
+        msg += `• **The 30-Day Wishlist Rule:** Never buy non-essentials immediately during a flash sale. Put it in your cart and wait 30 days. In 80% of cases, you'll realize you didn't really need it.\n`;
+        msg += `• **Cost-Per-Wear Principle:** Before buying expensive clothes, calculate: (Price / Times you will actually wear it). If it's a ₹2,000 shirt worn twice, that's ₹1,000 per wear!\n`;
+        msg += `• **Student ID Discounts:** Always check UNiDAYS, Student Beans, or brand student programs (Apple, Samsung, Nike) for 10-20% discounts.\n`;
+        msg += `• **Never use BNPL / No-Cost EMI:** Buying lifestyle items on credit steals your future pocket money.`;
+        return msg;
+    }
+
+    // 5. ENTERTAINMENT / MOVIES / OTT / PARTIES
+    if (q.includes("entertainment") || q.includes("movie") || q.includes("cinema") || q.includes("game") || q.includes("gaming") || q.includes("netflix") || q.includes("spotify") || q.includes("party") || q.includes("outing")) {
+        let msg = `🎬 **Entertainment & Social Outings Budget:**\n\n`;
+        if (entertainmentSpent > 0) {
+            msg += `You have spent **${inr(entertainmentSpent)}** on entertainment and outings.\n\n`;
+        }
+        msg += `**Student Entertainment Hacks:**\n`;
+        msg += `• **Student Subscriptions:** Spotify Student is ₹59/mo (vs ₹119). Amazon Prime Youth offers 50% cashback for students aged 18-24.\n`;
+        msg += `• **Pool Group Accounts:** Share a single Netflix/Disney+ Hotstar multi-screen plan among 4 roommates.\n`;
+        msg += `• **Matinee Shows:** Book weekday or morning shows at cinema halls for half the evening ticket price.`;
+        return msg;
+    }
+
+    // 6. EDUCATION / BOOKS / COURSES / CERTIFICATIONS
+    if (q.includes("education") || q.includes("book") || q.includes("padhai") || q.includes("course") || q.includes("udemy") || q.includes("exam") || q.includes("tuition") || q.includes("college fee")) {
+        let msg = `📚 **Education & Learning Investment:**\n\n`;
+        if (eduSpent > 0) {
+            msg += `Recorded education expenses: **${inr(eduSpent)}**.\n\n`;
+        }
+        msg += `Education is an investment in your future earning potential, but don't overpay:\n`;
+        msg += `• **Senior Notes & College Library:** Borrow standard textbooks from the college library or purchase used copies at 50% from seniors.\n`;
+        msg += `• **Free Certified Courses:** Use Coursera Financial Aid (apply for 100% scholarship on almost any course), NPTEL, and Harvard CS50 for top-tier certifications.\n`;
+        msg += `• **GitHub Student Developer Pack:** Gives you free domains, Canva Pro, JetBrains IDEs, and AWS credits worth over $2,000!`;
+        return msg;
+    }
+
+    // 7. BUYING GADGETS / LAPTOP / IPHONE / BIKE / AFFORDABILITY
+    if (q.includes("laptop") || q.includes("phone") || q.includes("iphone") || q.includes("bike") || q.includes("buy") || q.includes("afford") || q.includes("kharid") || q.includes("purchase") || q.includes("gadget")) {
+        let msg = `💻 **Major Purchase & Affordability Evaluation:**\n\n`;
+        if (netSavings > 0) {
+            msg += `Current monthly savings margin: **${inr(netSavings)}/month**.\n\n`;
+        }
+        msg += `**Before buying any major gadget:**\n`;
+        msg += `• **Need vs Want Test:** Is this device directly necessary for your engineering/coding/design coursework, or is it a lifestyle upgrade?\n`;
+        msg += `• **The 3X Savings Rule:** Do not buy until you have saved at least 2X to 3X the cost of the device, or save up via a dedicated Goal fund.\n`;
+        msg += `• **Student Tech Stores:** Apple Education Store offers ₹10,000+ student discount + free AirPods. Dell, HP, and Lenovo offer up to 15% student discounts with college ID.\n`;
+        msg += `• **Refurbished Goldmine:** Look at certified refurbished items with official brand warranty (Amazon Renewed / Cashify) to save 40%.`;
+        return msg;
+    }
+
+    // 8. INVESTING / SIP / MUTUAL FUNDS / STOCKS / CRYPTO
+    if (q.includes("invest") || q.includes("sip") || q.includes("mutual fund") || q.includes("share") || q.includes("stock") || q.includes("crypto") || q.includes("bitcoin") || q.includes("trading") || q.includes("fd") || q.includes("gold")) {
+        let msg = `📈 **Student Investing Blueprint (Safe & High Return):**\n\n`;
+        msg += `Investing early gives you an enormous compound interest advantage, but follow these rules:\n`;
+        msg += `• **Rule 1: Never do Options / F&O / Intraday:** SEBI reports 93% of retail traders lose money. Don't risk your college money!\n`;
+        msg += `• **Rule 2: Emergency Fund First:** Build a **₹3,000–₹5,000 emergency cushion** in a high-interest savings account (e.g. 6-7% p.a.) before entering the market.\n`;
+        msg += `• **Rule 3: Start a ₹500 Index SIP:** When you have regular surplus, start an SIP in a **Nifty 50 Index Fund** via Groww, Zerodha Coin, or Angel One.\n`;
+        msg += `• **Power of Time:** A ₹1,000 monthly SIP started at age 20 at 12% returns can grow to over **₹35 Lakhs** by age 40!`;
+        return msg;
+    }
+
+    // 9. CREDIT CARDS / BNPL / LOANS / DEBT / SLICE / LAZYPAY
+    if (q.includes("credit card") || q.includes("loan") || q.includes("karz") || q.includes("udhar") || q.includes("debt") || q.includes("borrow") || q.includes("bnpl") || q.includes("slice") || q.includes("lazypay") || q.includes("emi")) {
+        let msg = `💳 **Credit Cards & Student Debt Caution:**\n\n`;
+        msg += `⚠️ **Warning on Instant Loans & BNPL:**\n`;
+        msg += `• Instant student loan apps and BNPL services charge annualized interest rates of 36% to 48% plus steep penalty fees for missed payments.\n`;
+        msg += `• Defaulting as a student ruins your **CIBIL Score**, making it difficult to get education loans, car loans, or home loans later in life.\n\n`;
+        msg += `**The Safe Way to Build Credit Score as a Student:**\n`;
+        msg += `• Open a Fixed Deposit (₹5,000) and get a **Secured Credit Card** (like IDFC FIRST WOW or OneCard against FD).\n`;
+        msg += `• Use it only for small recurring expenses (<30% limit) and set Auto-Pay to 100% on-time full payment.`;
+        return msg;
+    }
+
+    // 10. BUDGET PLAN / HOW TO BUDGET / 50-30-20
+    if (q.includes("budget") || q.includes("plan") || q.includes("manage") || q.includes("pocket money") || q.includes("allocate") || q.includes("distribute") || q.includes("salary") || q.includes("allowance")) {
+        let msg = `🎓 **Personalized Student Budget Plan (50/30/20 Rule):**\n\n`;
+        const baseIncome = income > 0 ? income : 10000;
+        const needs = Math.round(baseIncome * 0.5);
+        const wants = Math.round(baseIncome * 0.3);
+        const savingsTarget = Math.round(baseIncome * 0.2);
+
+        if (income > 0) {
+            msg += `Based on your monthly income of **${inr(income)}**, here is your ideal monthly breakdown:\n`;
+        } else {
+            msg += `Here is the recommended blueprint (example based on standard ₹10,000 monthly allowance):\n`;
+        }
+
+        msg += `• **50% Needs (${inr(needs)}):** College fees, hostel/rent, mess/groceries, daily commute, phone recharge.\n`;
+        msg += `• **30% Lifestyle & Wants (${inr(wants)}):** Weekend outings, café snacks, movies, shopping, subscriptions.\n`;
+        msg += `• **20% Savings & Emergency (${inr(savingsTarget)}):** Goal funds, emergency cushion, micro-SIPs.\n\n`;
+
+        if (income > 0) {
+            if (totalExpenses > baseIncome * 0.8) {
+                msg += `⚠️ **Current Status:** You are currently spending **${spendRate}%** of your income. Try shifting ${inr(totalExpenses - (needs + wants))} into the savings column.`;
+            } else {
+                msg += `✅ **Current Status:** You're doing well! Maintain this balance to hit your savings goals quickly.`;
+            }
+        } else {
+            msg += `💡 Enter your actual income in the Budget section to see your customized rupee figures!`;
+        }
+        return msg;
+    }
+
+    // 11. HOW CAN I SAVE MORE / SAVE MORE MONEY
+    if (q.includes("save more") || q.includes("how to save") || q.includes("how can i save") || q.includes("bachat kaise") || q.includes("bachana")) {
+        let msg = `💰 **Action Plan: How to Save More Money as a Student:**\n\n`;
+        if (income > 0) {
+            msg += `• Current Monthly Income: **${inr(income)}**\n`;
+            msg += `• Current Monthly Expenses: **${inr(totalExpenses)}**\n`;
+            msg += `• Current Net Savings: **${inr(netSavings)}** (${savingsRate}%)\n\n`;
+        }
+
+        if (topCatAmount > 0) {
+            msg += `**1. Target Your Biggest Leak:** Your highest expense is **${topCat}** at **${inr(topCatAmount)}** (${topCatPercent}% of total). Cutting just 20% of this frees up **${inr(topCatAmount * 0.2)}** every month!\n\n`;
+        }
+
+        msg += `**2. Implement 'Reverse Budgeting':**\n`;
+        msg += `The day you receive your pocket money, transfer 15-20% immediately into a separate savings account before spending a single rupee. Spend only what remains.\n\n`;
+
+        msg += `**3. Plug UPI Micro-Leaks:**\n`;
+        msg += `UPI makes money invisible. Quick ₹30 cold drinks or ₹50 momos add up to ₹2,000+ monthly. Review your UPI history in FinAI weekly!`;
+        return msg;
+    }
+
+    // 12. AM I SPENDING TOO MUCH / OVERSPENDING / KHARCHA JYADA
+    if (q.includes("spending too much") || q.includes("spend too much") || q.includes("overspend") || q.includes("kharcha") || q.includes("control") || q.includes("reduce") || q.includes("kam kaise")) {
+        let msg = `📊 **Expense Audit & Overspending Check:**\n\n`;
+        if (income > 0) {
+            if (spendRate >= 90) {
+                msg += `🚨 **Critical Alert:** You are spending **${spendRate}%** of your monthly income! You have only **${inr(netSavings)}** remaining.\n\n`;
+            } else if (spendRate >= 70) {
+                msg += `⚠️ **Caution:** You are spending **${spendRate}%** of your monthly income. There is little room for emergency expenses.\n\n`;
+            } else {
+                msg += `✅ **Healthy:** You are spending **${spendRate}%** of your income, leaving **${inr(netSavings)}** (${savingsRate}%) intact.\n\n`;
+            }
+        } else {
+            msg += `You have recorded **${inr(totalExpenses)}** in total expenses.\n\n`;
+        }
+
+        if (topCatAmount > 0) {
+            msg += `• **Biggest Category:** **${topCat}** accounts for **${inr(topCatAmount)}** (${topCatPercent}% of your spending).\n`;
+        }
+        if (safeExpenses.length > 0) {
+            msg += `• **Transaction Count:** You have logged ${safeExpenses.length} transactions.\n`;
+        }
+        msg += `\n**3 Rapid Steps to Regain Control:**\n`;
+        msg += `1. **Institute 2 Zero-Spend Days:** Pick two days this week where you spend ₹0 outside of your fixed hostel mess.\n`;
+        msg += `2. **Uninstall Quick-Delivery Apps:** Remove apps like Zepto/Blinkit/Swiggy if you tend to order late-night snacks impulsively.\n`;
+        msg += `3. **Set Category Budgets:** In FinAI, set a strict monthly budget so you receive warnings before overrunning.`;
+        return msg;
+    }
+
+    // 13. HOW MUCH SHOULD I SAVE
+    if (q.includes("how much should i save") || q.includes("kitna save") || q.includes("kitna bachana")) {
+        let msg = `🏦 **Recommended Savings Target:**\n\n`;
+        if (income > 0) {
+            const target20 = Math.round(income * 0.2);
+            const target30 = Math.round(income * 0.3);
+            msg += `Based on your monthly income of **${inr(income)}**:\n`;
+            msg += `• **Minimum Target (15%):** **${inr(income * 0.15)}/month**\n`;
+            msg += `• **Healthy Target (20%):** **${inr(target20)}/month**\n`;
+            msg += `• **Aggressive Target (30%):** **${inr(target30)}/month**\n\n`;
+            msg += `Currently, you are saving **${inr(netSavings)}** (${savingsRate}%). `;
+            if (savingsRate >= 20) {
+                msg += `Fantastic! You are already hitting the recommended healthy target!`;
+            } else {
+                msg += `Try trimming one unnecessary weekend outing to bridge the gap to ${inr(target20)}.`;
+            }
+        } else {
+            msg += `For students, aim to save **15% to 20%** of your monthly allowance.\n`;
+            msg += `• If allowance is ₹5,000 → Target saving: **₹1,000/month**\n`;
+            msg += `• If allowance is ₹10,000 → Target saving: **₹2,000/month**\n\n`;
+            msg += `Add your income in the Budget section to see your personalized numbers!`;
+        }
+        return msg;
+    }
+
+    // 14. EMERGENCY FUND
+    if (q.includes("emergency") || q.includes("aapatkaal") || q.includes("backup fund")) {
+        let msg = `🛡️ **Student Emergency Fund Guide:**\n\n`;
+        msg += `An emergency fund is your safety net for unexpected situations (urgent travel, medical expense, lost phone/card) without needing to ask parents in distress.\n\n`;
+        msg += `• **Target Size:** Aim for **₹3,000 to ₹5,000** as a student.\n`;
+        msg += `• **Where to Keep It:** In a separate digital savings account (like Airtel Payments Bank, Fi Money, or Kotak 811) with a debit card, disconnected from your daily UPI apps.\n`;
+        msg += `• **Golden Rule:** Never touch this fund for sales, movie tickets, or café treats!`;
+        return msg;
+    }
+
+    // 15. EARNING / SIDE HUSTLES FOR STUDENTS
+    if (q.includes("earn") || q.includes("kamai") || q.includes("side hustle") || q.includes("part time") || q.includes("freelance") || q.includes("internship")) {
+        let msg = `🚀 **High-Return Student Earning Avenues (0 Capital):**\n\n`;
+        msg += `1. **School Tuition / Teaching:** Teach Maths, Science, or English to students in classes 6–10 near your hostel. Earn ₹3,000–₹6,000/month for just 1 hour daily.\n`;
+        msg += `2. **Digital Freelancing:** Learn high-demand skills (Video editing in CapCut/Premiere, Thumbnail design in Canva, Web design) and offer services to local creators or businesses.\n`;
+        msg += `3. **Technical & Content Writing:** Write tech blogs, college exam solutions, or documentation for online platforms.\n`;
+        msg += `4. **Campus Internships:** Apply on Internshala, AngelList, or LinkedIn for remote paid summer internships (stipends typically ₹5,000–₹15,000/mo).`;
+        return msg;
+    }
+
+    // 16. COMPREHENSIVE INTELLIGENT FALLBACK (Takes all live user data into account!)
+    let msg = `💡 **FinAI Student Financial Assessment:**\n\n`;
+    if (income > 0) {
+        msg += `• **Monthly Income:** ${inr(income)}\n`;
+        msg += `• **Total Recorded Expenses:** ${inr(totalExpenses)} across ${safeExpenses.length} transaction(s)\n`;
+        msg += `• **Net Balance:** ${netSavings >= 0 ? inr(netSavings) + ' (Surplus)' : '-' + inr(Math.abs(netSavings)) + ' (Deficit)'}\n`;
+        if (topCatAmount > 0) {
+            msg += `• **Top Spending Area:** ${topCat} (${inr(topCatAmount)}, ${topCatPercent}% of total)\n`;
+        }
+        msg += `\n`;
+    }
+
+    msg += `**Key Advice for your query:**\n`;
+    msg += `• **Track Every Transaction:** Make a habit of logging every small UPI debit right after you scan the QR code.\n`;
+    msg += `• **Prioritize Essentials:** Ensure college fees, books, and hostel meals are covered before spending on leisure.\n`;
+    msg += `• **Build a ₹2,000 Safety Cushion:** Keep a micro-savings buffer to avoid borrowing from friends at the end of the month.\n\n`;
+    msg += `*Feel free to ask specific questions about Food, Travel, Shopping, Budget plans, or Investments!*`;
+
+    return msg;
 }
 
 async function askGroqDirect(question, finance, expensesList) {
     const key = getStoredGroqKey();
     if (!key) {
-        throw new Error("GROQ_KEY_REQUIRED");
+        return null;
     }
 
     const safeExpenses = Array.isArray(expensesList) ? expensesList.slice(0, 50) : [];
@@ -3547,20 +3902,21 @@ async function answerCustomQuestion(question) {
         submitButton.dataset.originalText =
             submitButton.innerHTML;
         submitButton.innerHTML =
-            "<span>Thinking...</span><span aria-hidden='true'>…</span>";
+            "<span>Analyzing...</span><span aria-hidden='true'>⏳</span>";
     }
 
     try {
         let answer = null;
         const backendUrl = getStoredBackendUrl();
+        const hasGroqKey = Boolean(getStoredGroqKey());
         const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
         const hasExplicitBackend = Boolean(backendUrl);
 
-        // 1. Try Backend if configured or running locally
-        if (isLocalhost || hasExplicitBackend) {
+        // 1. Try Backend if configured or running locally with server.js
+        if (hasExplicitBackend || (isLocalhost && !hasGroqKey)) {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000);
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
 
                 const response = await fetch(`${backendUrl}/api/ask`, {
                     method: "POST",
@@ -3579,32 +3935,25 @@ async function answerCustomQuestion(question) {
                     if (data && data.answer) {
                         answer = data.answer;
                     }
-                } else if (hasExplicitBackend) {
-                    const data = await response.json().catch(() => ({}));
-                    throw new Error(data?.error || `Backend returned status ${response.status}`);
                 }
             } catch (err) {
-                // If backend was explicitly specified and failed, or local without direct key
-                if (hasExplicitBackend && !getStoredGroqKey()) {
-                    throw err;
-                }
+                console.warn("Backend /api/ask unavailable, using FinAI native engine:", err);
             }
         }
 
-        // 2. Fallback to Direct In-Browser Groq
-        if (!answer) {
+        // 2. Try Direct In-Browser Groq if key was provided
+        if (!answer && hasGroqKey) {
             try {
                 answer = await askGroqDirect(question, financeData, expenses);
             } catch (directErr) {
-                if (directErr.message === "GROQ_KEY_REQUIRED") {
-                    showAIResponse(
-                        "💡 **GitHub Pages Setup Required:** GitHub Pages par backend server nahi hota. Direct Groq AI chalane ke liye upar '⚙️ AI Setup' button par click karke apna Groq API key enter karein."
-                    );
-                    openAiSettingsModal(question);
-                    return;
-                }
-                throw directErr;
+                console.warn("Groq request failed, using FinAI native engine:", directErr);
             }
+        }
+
+        // 3. Fallback to Built-in Smart Client-Side FinAI Engine (Zero Setup / 100% GitHub Pages native)
+        if (!answer) {
+            await new Promise(r => setTimeout(r, 350));
+            answer = generateFinAiAdvice(question, financeData, expenses);
         }
 
         showAIResponse(answer);
@@ -3616,11 +3965,9 @@ async function answerCustomQuestion(question) {
             error
         );
 
-        showAIResponse(
-            error.message.includes("GROQ_API_KEY") || error.message.includes("API key") || error.message.includes("401")
-                ? "Groq API key issue. '⚙️ AI Setup' par click karke apna valid Groq key check karein."
-                : `AI connect nahi ho paya: ${error.message || "Please check server or AI setup."}`
-        );
+        // Guaranteed fallback so customer never sees an error or prompt
+        const fallback = generateFinAiAdvice(question, financeData, expenses);
+        showAIResponse(fallback);
 
     } finally {
 

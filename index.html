@@ -1424,7 +1424,7 @@
                     id="openAiSettingsBtn"
                     class="ai-settings-toggle-btn"
                     type="button"
-                    title="Configure Groq API Key or Backend Server"
+                    title="Advanced AI Settings (Optional - Works 100% Free on GitHub Pages)"
                 >
                     ⚙️ AI Setup
                 </button>
@@ -1772,28 +1772,33 @@
             </button>
 
             <div class="ai-settings-modal-header">
-                <span class="ai-settings-badge">🤖 GROQ AI CONFIG</span>
+                <span class="ai-settings-badge">⚙️ ADVANCED AI CONFIG (OPTIONAL)</span>
                 <h2>FinAI Advisor Settings</h2>
                 <p>
-                    GitHub Pages par direct Groq AI chalane ke liye apna API Key enter karein. Yeh key sirf aapke browser me secure rahegi.
+                    ✅ <strong>FinAI Advisor GitHub Pages par 100% free aur bina kisi key ke chalta hai!</strong><br>
+                    Agar aap developer hain aur apna personal Groq LLM API Key ya custom backend server use karna chahein, toh neeche optionally set kar sakte hain.
                 </p>
+                <div class="ai-autosave-indicator" id="aiAutoSaveIndicator">
+                    <span class="ai-autosave-dot" id="aiAutoSaveDot"></span>
+                    <span class="ai-autosave-text" id="aiAutoSaveText">⚡ Auto-saved (Save dabane ki zaroorat nahi hai)</span>
+                </div>
             </div>
 
             <form id="aiSettingsForm">
 
                 <label>
-                    Groq API Key
-                    <span class="field-sub">Browser se direct AI ke liye zaroori hai</span>
+                    Groq API Key (Optional)
+                    <span class="field-sub">Optional: Key na hone par built-in Smart FinAI automatically kaam karega</span>
                     <input
                         type="password"
                         id="aiGroqApiKeyInput"
-                        placeholder="gsk_..."
+                        placeholder="gsk_... (Optional)"
                         autocomplete="off"
                     >
                 </label>
 
                 <div class="ai-settings-help-row">
-                    <span>💡 Free Groq Key chahiye?</span>
+                    <span>💡 Free Groq Key chahiye? (Optional)</span>
                     <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">
                         console.groq.com/keys ↗
                     </a>
@@ -1824,7 +1829,7 @@
                         type="submit"
                         id="saveAiSettingsBtn"
                     >
-                        💾 Save Settings
+                        ✓ Done (Auto-saved)
                     </button>
                     <button
                         class="ghost-btn"
